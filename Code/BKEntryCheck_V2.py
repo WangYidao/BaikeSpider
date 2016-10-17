@@ -17,6 +17,11 @@ safari = webdriver.Safari()                                   # 打开safari浏�
 
 WB = load_workbook('test_find_element.xlsx')                  # 打开Excel文件
 
+Aero_Avia_Keys = ['航空','航天','飞行器','飞机','导弹','客机','战斗机','轰炸机','歼击机','攻击机','运输机','直升机','无人机',
+                  '火箭','卫星','空间站','探测器','飞船']
+
+Key_List = Aero_Avia_Keys
+
 # 主循环，遍历Worksheets
 for ws_index in range(len(WB.sheetnames)):
 
@@ -121,7 +126,64 @@ for ws_index in range(len(WB.sheetnames)):
 
         except NoSuchElementException:
             WS.cell(row = row_index, column = Head_Column_No + 2).value = "已收录"
-            WS.cell(row = row_index, column = Head_Column_No + 4).value = safari.current_url
+
+            # 查询是否是多义词
+            try:
+                safari.find_element_by_class_name("lemmaWgt-subLemmaListTitle")
+
+                Poly_Entries = safari.find_elements_by_xpath("//ul/li[@class='list-dot list-dot-paddingleft/div/a']")
+
+                print("义项个数：%d" % (len(Poly_Entries)))
+
+                for Entry in Poly_Entries:
+                    for Key in Key_List:
+                        if Key in Entry.text:
+                            break
+                        else:
+                            Poly_Entries.remove(Entry)
+
+                if len(Poly_Entries) == 1:
+                    print("只有一个义项符合要求，正确")
+                else:
+                    print("有多个义项符合要求，错误")
+
+                Valid_Entry_Link = Poly_Entries[0].get_attribute('href')
+
+                print("符合要求义项链接：%s" % (Valid_Entry_Link))
+                safari.get(Valid_Entry_Link)
+                safari.implicitly_wait(2)
+
+                WS.cell(row=row_index, column=Head_Column_No + 4).value = safari.current_url
+            except NoSuchElementException:
+                try:
+                    safari.find_element_by_class_name("polysemantList-header-title")
+
+                    Poly_Entries = safari.find_elements_by_xpath("//div[@class='polysemant-list polysemant-list-normal'/ul/li[@class='item']/a")
+                    Poly_Entries.insert(0,safari.find_element_by_xpath("//div[@class='polysemant-list polysemant-list-normal'/ul/li[@class='item']/span[@class='selected']"))
+
+                    print("义项个数：%d" % (len(Poly_Entries)))
+
+                    for Entry in Poly_Entries:
+                        for Key in Key_List:
+                            if Key in Entry.text:
+                                break
+                            else:
+                                Poly_Entries.remove(Entry)
+
+                    if len(Poly_Entries) == 1:
+                        print("只有一个义项符合要求，正确")
+                    else:
+                        print("有多个义项符合要求，错误")
+
+                    Valid_Entry_Link = Poly_Entries[0].get_attribute('href')
+
+                    print("符合要求义项链接：%s" % (Valid_Entry_Link))
+                    safari.get(Valid_Entry_Link)
+                    safari.implicitly_wait(2)
+
+                    WS.cell(row=row_index, column=Head_Column_No + 4).value = safari.current_url
+                except NoSuchElementException:
+                    print("本词条非多义词")
 
             # 获取特征点
             Entry_Data = Baike_Data_Scratch(safari)
