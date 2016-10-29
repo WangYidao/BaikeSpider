@@ -15,6 +15,18 @@ os.environ["SELENIUM_SERVER_JAR"] = "/Users/bin/Desktop/SourceTree/BaikeEnv/sele
 
 def Baike_Data_Scratch( Browser ):
 
+    # Results[0]: 百度词条名称
+    # Results[1]: 概述字数
+    # Results[2]: 基本信息栏条数
+    # Results[3]: 一级目录个数
+    # Results[4-]: 二级目录个数
+    # Results[5-]: 正文段数
+    # Results[6/4]: 正文字数
+    # Results[7/5]: 参考文献条数
+    # Results[8-]: 图册个数
+    # Results[9/6]: 图片条数
+    # Results[10/7]: "科普中国百科"是否收录
+
     Results = []
 
     # 获取特征点
@@ -58,20 +70,20 @@ def Baike_Data_Scratch( Browser ):
     print("一级目录条数:%d" %Results[-1])                     # debug
 
     # 获取二级目录
-    try:
-        Browser.find_element_by_xpath("//div[@class='lemma-catalog']/div/ol/li[@class='level2']")
-        print("找到二级目录")
-        Results.append(len(Browser.find_elements_by_xpath("//div[@class='lemma-catalog']/div/ol/li[@class='level2']")))
-    except NoSuchElementException:
-        Results.append(-1)
+    #try:
+        #Browser.find_element_by_xpath("//div[@class='lemma-catalog']/div/ol/li[@class='level2']")
+        #print("找到二级目录")
+        #Results.append(len(Browser.find_elements_by_xpath("//div[@class='lemma-catalog']/div/ol/li[@class='level2']")))
+    #except NoSuchElementException:
+        #Results.append(-1)
 
-    print("二级目录条数:%d" %Results[-1])                    # debug
+    #print("二级目录条数:%d" %Results[-1])                    # debug
 
     # 获取正文段数及字数
     try:
         Browser.find_element_by_xpath("//div[@label-module='para']")
         Content_Paragraphs = Browser.find_elements_by_xpath("//div[@label-module='para']")
-        Results.append(len(Content_Paragraphs))
+        #Results.append(len(Content_Paragraphs))
 
         Number_Of_Words = 0
         for Content_Paragraph in Content_Paragraphs:
@@ -79,10 +91,10 @@ def Baike_Data_Scratch( Browser ):
 
         Results.append(Number_Of_Words)
     except NoSuchElementException:
-        Results.append(-1)
+        #Results.append(-1)
         Results.append(-1)
 
-    print("正文段落数:%d" %Results[-2])                      # debug
+    #print("正文段落数:%d" %Results[-2])                      # debug
     print("正文字数:%d" %Results[-1])                       # debug
 
 
@@ -102,30 +114,30 @@ def Baike_Data_Scratch( Browser ):
         Browser.find_element_by_link_text("更多图册")
         print("找到多个图册")
         Browser.get(Browser.find_element_by_link_text("更多图册").get_attribute('href'))
-        Browser.implicitly_wait(2)
+        Browser.implicitly_wait(1)
 
-        Results.append(int(Browser.find_element_by_xpath("//span[@class='album-num num']").text))
+        #Results.append(int(Browser.find_element_by_xpath("//span[@class='album-num num']").text))
         Results.append(int(Browser.find_element_by_xpath("//span[@class='pic-num num']").text))
 
         Browser.get(Browser.find_element_by_class_name("return-back").get_attribute('href'))
-        Browser.implicitly_wait(2)
+        Browser.implicitly_wait(1)
     except NoSuchElementException:
         try:
             Browser.find_element_by_class_name("summary-pic")
             print("找到一个图册")
             Browser.get(Browser.find_element_by_xpath("//div[@class='summary-pic']/a").get_attribute('href'))
-            Browser.implicitly_wait(2)
+            Browser.implicitly_wait(1)
 
-            Results.append(1)
+            #Results.append(1)
             Results.append(int(Browser.find_element_by_xpath("//span[@style='color:#427cb8']").text))
 
             Browser.get(Browser.find_element_by_link_text("返回词条").get_attribute('href'))
-            Browser.implicitly_wait(2)
+            Browser.implicitly_wait(1)
         except NoSuchElementException:
-            Results.append(-1)
+            #Results.append(-1)
             Results.append(-1)
 
-    print("词条图册数量:%d" %Results[-2])
+    #print("词条图册数量:%d" %Results[-2])
     print("词条图片数量:%d" %Results[-1])
 
     # 查询词条是否被"科普中国百科"收录
