@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException
 import re
 import sample
 
-WB = load_workbook('/Users/bin/Desktop/提交/气候环境_大气术语_补充_20161119_53.xlsx')
+WB = load_workbook('/Users/bin/Desktop/能源利用_20161123.xlsx')
 
 safari = webdriver.Safari()
 
@@ -69,7 +69,7 @@ for ws_index in range(len(WB.sheetnames)):
             except NoSuchElementException:
                 pass
 
-            WB.save('/Users/bin/Desktop/提交/气候环境_大气术语_补充_20161119_53.xlsx')
+            WB.save('/Users/bin/Desktop/能源利用_20161123.xlsx')
 
 safari.close()                                                        # 关闭safari窗口
 
